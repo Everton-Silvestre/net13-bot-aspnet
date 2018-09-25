@@ -2,23 +2,22 @@
 
 namespace SimpleBot.Logic
 {
-    public  class SimpleBotUser
+    public class SimpleBotUser
     {
-        public string Popula_UserProfile(Message message)
+        IRepository _repo;
+
+        public SimpleBotUser(IRepository repo)
         {
-            var id = message.Id;
-            UserProfile prof;
+            this._repo = repo;
+        }
 
-            using (var context = new Contexto())
-            {
-                var userProfileSql = new UserProfileSqlRepository(context);
+        public string Popula_UserProfile(Message message)
+        {                                     
+            var prof = this._repo.GetProfile(message.Id);
 
-                prof = userProfileSql.GetProfile(id);
+            prof.Visitas += 1;
 
-                prof.Visitas += 1;
-
-                userProfileSql.SetProfile(id, prof);
-            }
+            this._repo.SetProfile(message.Id, prof);           
 
             return $"{message.User} disse '{message.Text} e mandou {prof.Visitas} '";
         }
