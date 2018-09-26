@@ -2,7 +2,7 @@
 
 namespace SimpleBot.Interface
 {
-    internal interface IUserProfileRepository
+    public interface IUserProfileRepository
     {
         UserProfile GetProfile(string id);
 

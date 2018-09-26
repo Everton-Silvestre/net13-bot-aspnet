@@ -1,7 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System.Data.Entity;
 using System.Linq;
 using SimpleBot.Interface;
-using System.Data.Entity;
 using SimpleBot.Model; 
 
 namespace SimpleBot.Logic
@@ -9,19 +8,16 @@ namespace SimpleBot.Logic
     public class UserProfileSqlRepository : IUserProfileRepository
     {
         private readonly Contexto _context;
-        private readonly List<Profile> _collection;
-       
-
-        public UserProfileSqlRepository(Contexto context)
+        
+        public UserProfileSqlRepository()
         {
-            _context = context;
-            _collection = context.Profile.ToList();
+            _context = new Contexto();           
         }
         
         public UserProfile GetProfile(string id)
         {
             
-            var profile = _collection.FirstOrDefault(x => x.MessageId==id) ?? new Profile();
+            var profile = _context.Profile.FirstOrDefault(x => x.MessageId==id) ?? new Profile();
 
             return new UserProfile
             {
@@ -33,28 +29,25 @@ namespace SimpleBot.Logic
 
         public void SetProfile(string id, UserProfile profile)
         {
-            var prof = _collection.FirstOrDefault(x => x.MessageId == id);
+            var prof = _context.Profile.FirstOrDefault(x => x.MessageId == id);
 
-            if (prof == null)
+            if (prof != null)
             {
-                prof = new Profile
+                _context.Profile.Attach(prof);
+                _context.Entry(prof).State = EntityState.Modified;
+            }
+            else
+            {
+                _context.Profile.Add( new Profile
                 {
                     MessageId = profile.Id,
                     Visitas = profile.Visitas,
                     Nome = profile.Id
-                };
-
-                _context.Profile.Add(prof);
-                _context.SaveChanges();
-
-                return;
+                });
             }
 
-            prof.MessageId = profile.Id;
-            prof.Visitas = profile.Visitas;
-
-            _context.Entry(prof).State = EntityState.Modified;
             _context.SaveChanges();
+                        
         }
     }
 }

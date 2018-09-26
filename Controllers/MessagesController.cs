@@ -6,6 +6,7 @@ using System.Web.Http;
 using System.Web.Http.Description;
 using Microsoft.Bot.Connector;
 using SimpleBot.Logic;
+using SimpleBot.Model;
 
 namespace SimpleBot.Controllers
 {
@@ -34,7 +35,7 @@ namespace SimpleBot.Controllers
 
             var message = new Message(userFromId, userFromName, text);
 
-            var response = new SimpleBotUser().Reply(message);
+            var response = new SimpleBotUser(new UserProfileSqlRepository()).Reply(message);
 
             await ReplyUserAsync(activity, response);
         }
